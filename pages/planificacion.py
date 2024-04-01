@@ -49,24 +49,37 @@ def insert_data(conn, data):
 
 
 
-def main():
+def app():
     st.title("Planificación de Evaluaciones")
-
+    if 'carrera_seleccionada' not in st.session_state:
+        carrera_seleccionada = None
+    if 'año_seleccionado' not in st.session_state:
+        año_seleccionado = None
+    if 'asignatura' not in st.session_state:
+        asignatura = None
+    if 'curso' not in st.session_state:
+        curso = None
+    if 'evaluacion' not in st.session_state:
+        evaluacion = None
+    if 'fecha_inicio' not in st.session_state:
+        fecha_inicio = None
+    if 'fecha_fin' not in st.session_state:
+        fecha_fin = None
     # Opciones para seleccionar la carrera y el año
     carreras = ["Ciencias de la Computación", "Ciencia de Datos", "Matemática"]
     años = list(range(1,6)) # Ajusta el rango según sea necesario
 
-    carrera_seleccionada = st.selectbox("Selecciona la carrera:", carreras)
-    año_seleccionado = st.selectbox("Selecciona el año:", años)
+    carrera_seleccionada = st.selectbox("Selecciona la carrera:", carreras, key='carrera_seleccionada')
+    año_seleccionado = st.selectbox("Selecciona el año:", años, key='año_seleccionado')
 
-    asignatura = st.text_input("Asignatura")
+    asignatura = st.text_input("Asignatura", key='asignatura')
     if type(asignatura) != str:
         st.warning("El valor ingresado debe ser un texto")
         asignatura = None
     curso=["2000-2001","2001-20002","2002-2003","2003-2004","2004-2005","2005-2006","2006-2007","2007-2008","2008-2009","2009-2010","2010-2011","2011-2012","2012-2013","2013-2014","2014-2015","2015-2016","2016-2017","2017-2018","2018-2019","2019-2020","2020-2021","2021-2022","2022-2023","2023-2024","2024-2025","2025-2026","2026-2027"]    
-    curso= st.selectbox("Curso",curso)
+    curso = st.selectbox("Curso", curso, key='curso')
     
-    evaluacion = st.text_input("Evaluación")
+    evaluacion = st.text_input("Evaluación", key='evaluacion')
     if evaluacion=="":
         pass
     else:
@@ -78,8 +91,8 @@ def main():
         
     
     
-    fecha_inicio = st.date_input("Fecha de inicio")
-    fecha_fin = st.date_input("Fecha de término")
+    fecha_inicio = st.date_input("Fecha de inicio",key="fecha_inicio")
+    fecha_fin = st.date_input("Fecha de término",key="fecha_fin")
     if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
         st.warning("La fecha de inicio debe ser anterior a la fecha de término")
         fecha_inicio = None
@@ -101,5 +114,3 @@ def main():
             else:
                 st.error("Error al conectar con la base de datos")
 
-if __name__ == "__main__":
-    main()

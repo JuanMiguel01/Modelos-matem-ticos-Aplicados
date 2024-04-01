@@ -1,17 +1,13 @@
 import streamlit as st
 from pages import bienvenida, planificacion, calendario
 
-PAGES = {
+pages = {
     "Bienvenida": bienvenida.app,
     "Planificación de Evaluaciones": planificacion.app,
     "Calendario de Exámenes": calendario.app,
 }
 
-def main():
-    st.sidebar.title('Navegación')
-    selection = st.sidebar.radio("Ir a", list(PAGES.keys()))
-    page = PAGES[selection]
-    page()
+page = st.sidebar.selectbox("Navegación", list(pages.keys()))
 
-if __name__ == "__main__":
-    main()
+# Ejecuta la función correspondiente a la página seleccionada
+pages[page]()
