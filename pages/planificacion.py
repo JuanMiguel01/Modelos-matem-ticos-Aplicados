@@ -2,6 +2,8 @@
 import streamlit as st
 import sqlite3
 from sqlite3 import Error
+from menu import menu_with_redirect
+menu_with_redirect()
 def create_connection(db_file):
     conn = None
     try:
@@ -114,3 +116,4 @@ def app():
             else:
                 st.error("Error al conectar con la base de datos")
 
+app()

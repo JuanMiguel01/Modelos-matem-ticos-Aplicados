@@ -1,13 +1,23 @@
 import streamlit as st
-from pages import bienvenida, planificacion, calendario
+from menu import menu
 
-pages = {
-    "Bienvenida": bienvenida.app,
-    "Planificación de Evaluaciones": planificacion.app,
-    "Calendario de Exámenes": calendario.app,
-}
+# Initialize st.session_state.role to None
+if "role" not in st.session_state:
+    st.session_state.role = None
 
-page = st.sidebar.selectbox("Navegación", list(pages.keys()))
+# Retrieve the role from Session State to initialize the widget
+st.session_state._role = st.session_state.role
 
-# Ejecuta la función correspondiente a la página seleccionada
-pages[page]()
+def set_role():
+    # Callback function to save the role selection to Session State
+    st.session_state.role = st.session_state._role
+
+
+# Selectbox to choose role
+st.selectbox(
+    "Select your role:",
+    [None, "user", "admin", "super-admin"],
+    key="_role",
+    on_change=set_role,
+)
+menu() # Render the dynamic menu!

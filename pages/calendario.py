@@ -1,6 +1,9 @@
 
 import streamlit as st
 import sqlite3
+from menu import menu_with_redirect
+menu_with_redirect()
+
 def obtener_asignaturas(carrera, año, curso):
     
     con = sqlite3.connect("mi_base_de_datos.db") 
@@ -37,3 +40,5 @@ def app():
             st.table(data)
         else:
             st.write("No se encontraron asignaturas para la selección.")
+
+app()
