@@ -140,27 +140,23 @@ def preprocesar_datos(detalles,calificaciones):
     # Calcular F, V, K, Di
     F = fechas_excluidas
     V = plazos_examen_total
-    print("calificaciones por asignatura")
-    print(calificaciones_por_asignatura)
-    print("fechas excluidas y plazos examen")
-    print(fechas_excluidas)
-    print(plazos_examen_total)
-    print("duracion cursos")
-    print(duracion_cursos)
+    
     K = calificaciones_por_asignatura
     Di = duracion_cursos
     cursos=[]
+    pre_calendario=[]
     for i in range(len(plazos_examen_total)):
         cursos.append(Curso(len(plazos_examen_total[i]),F[i],V[i],K[i],Di[i]))
-        print("CAlendario")
-        print(cursos[i].fit_to_date(inicio_curso))
-    print("cursos")
-
-    for i, curso in enumerate (cursos):
-
-        print("inicio: ", datetime.strftime (inicio_curso, '%d/%m/%Y'))
-        print ([ datetime.strftime (date, '%d/%m/%Y') for date in curso.fit_to_date (inicio_cursos [i]) ])
-
+        
+        pre_calendario.append(cursos[i].fit_to_date(inicio_curso))
+    calendario ={}
+    i=0
+    for clave, evaluaciones in detalles.items():
+        clave_=(evaluacion[0],clave[0],clave[1],clave[2])
+        calendario[clave] = pre_calendario[i]
+        i+=1
+    
+    return calendario
 def process_data_and_save(data, new_db_name):
     new_db_conn = create_new_database(new_db_name)
     c = new_db_conn.cursor()
