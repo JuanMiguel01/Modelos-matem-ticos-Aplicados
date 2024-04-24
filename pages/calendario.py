@@ -6,7 +6,7 @@ menu_with_redirect()
 
 def obtener_asignaturas(carrera, año, curso):
     
-    con = sqlite3.connect("mi_base_de_datos.db") 
+    con = sqlite3.connect("evaluaciones.db") 
     cur = con.cursor()
     
     cur.execute('''SELECT asignatura, fecha_inicio, fecha_fin 
