@@ -1,7 +1,8 @@
 import sqlite3
 import os
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
+from problem import Problem
 def create_new_database(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
@@ -80,6 +81,7 @@ def preprocesar_datos(detalles,calificaciones):
     plazos_examen_total=[]
     calificaciones_por_asignatura=[]
     duracion_cursos=[]
+    inicio_cursos=[]
     for clave, evaluaciones in detalles.items():
         # Extraer y procesar las fechas
         fechas_excluidas_locales = []
@@ -112,6 +114,7 @@ def preprocesar_datos(detalles,calificaciones):
 
 
             duracion_curso = fin_curso - inicio_curso
+        inicio_cursos.append(inicio_curso)
 
         duracion_cursos.append(duracion_curso.days)
         for i in range(len(fechas_examen)):
@@ -147,14 +150,16 @@ def preprocesar_datos(detalles,calificaciones):
     K = calificaciones_por_asignatura
     Di = duracion_cursos
     cursos=[]
-    
     for i in range(len(plazos_examen_total)):
-        cursos.append(Curso(1,len(plazos_examen_total[i]),F[i],V[i],K[i],Di[i]))
+        cursos.append(Curso(len(plazos_examen_total[i]),F[i],V[i],K[i],Di[i]))
+        print("CAlendario")
+        print(cursos[i].fit_to_date(inicio_curso))
     print("cursos")
-    print(cursos)
-    # Crear una instancia de la clase Curso con los valores inicializados
-    #######################curso = Curso(1, len(evaluaciones), F, V, K, Di)
-    # Aquí puedes llamar a los métodos de la clase Curso o hacer lo que necesites con la instancia curso
+
+    for i, curso in enumerate (cursos):
+
+        print("inicio: ", datetime.strftime (inicio_curso, '%d/%m/%Y'))
+        print ([ datetime.strftime (date, '%d/%m/%Y') for date in curso.fit_to_date (inicio_cursos [i]) ])
 
 def process_data_and_save(data, new_db_name):
     new_db_conn = create_new_database(new_db_name)
@@ -163,14 +168,16 @@ def process_data_and_save(data, new_db_name):
         c.execute('INSERT INTO calendarios VALUES (?, ?, ?, ?, ?)', (carrera, año, curso, asignatura, fecha_examen))
     new_db_conn.commit()
     new_db_conn.close()
-class Curso:
-    def __init__(self, M, N, F, V, K, Di):
-        self.M = M # Número de cursos
-        self.N = N # Número de asignaturas
-        self.F = np.array(F) # Días no válidos para asignar pruebas (feriados, fin de semana)
-        self.V = np.array(V) # Plazos para realizar las pruebas
-        self.K = np.array(K) # Carga de trabajo de las asignaturas
-        self.Di = np.array(Di) # Días del curso
+class Curso (Problem):
+    def fit (self):
+        x, val = self.optimize ()
+        return x[0]
+    def fit_to_date (self, base_date: datetime):
+        x = self.fit ()
+        x = [ base_date + timedelta (days = int (day)) for day in x ]
+        return x
+    def __init__ (self, N, F, V, K, Di):
+        super ().__init__ (1, N, [F], [V], [K], [Di])
 def main():
     current_db_name = 'evaluaciones.db'
     new_db_name = 'calendarios_optimizados.db'
