@@ -1,7 +1,9 @@
 
 import streamlit as st
 import sqlite3
+import pandas as pd
 from menu import menu_with_redirect
+
 menu_with_redirect()
 
 def obtener_asignaturas(carrera, año, curso):
@@ -18,27 +20,67 @@ def obtener_asignaturas(carrera, año, curso):
     con.close()
     
     return asignaturas
+def get_carreras(conn):
+    c = conn.cursor()
+    c.execute("SELECT DISTINCT carrera FROM calendarios")
+    carreras = [row[0] for row in c.fetchall()]
+    return carreras
+
+def get_cursos(conn, carrera):
+    cursos = [] # Inicializa cursos como una lista vacía
+    try:
+        c = conn.cursor()
+        c.execute("SELECT DISTINCT curso FROM calendarios WHERE carrera = ?", (carrera,))
+        cursos = [row[0] for row in c.fetchall()]
+    except Exception as e:
+        st.write(f"Error al obtener cursos para la carrera seleccionada: {e}")
+    return cursos
+
+
+def get_años(conn,carrera,curso):
+    try:
+        c = conn.cursor()
+        c.execute("SELECT DISTINCT año FROM calendarios Where carrera = ? AND curso = ?",(carrera,curso))
+        años = [row[0] for row in c.fetchall()]
+    except :
+        st.write("No hay años para el curso seleccionado en la carrera seleccionada")
+    return años
 def app():
     st.title("Selecciona tu Calendario")
-
-    carreras = ["Ciencias de la Computación", "Ciencia de Datos", "Matemática"]
-    años = list(range(1, 6)) # Ajusta el rango según sea necesario
-    cursos = ["2000-2001", "2001-2002", "2002-2003", "2003-2004", "2004-2005", "2005-2006", "2006-2007", "2007-2008", "2008-2009", "2009-2010", "2010-2011", "2011-2012", "2012-2013", "2013-2014", "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019", "2019-2020", "2020-2021", "2021-2022", "2022-2023", "2023-2024", "2024-2025", "2025-2026", "2026-2027"]
-
-    carrera_seleccionada = st.selectbox("Selecciona la carrera:", carreras)
-    año_seleccionado = st.selectbox("Selecciona el año:", años)
-    curso_seleccionado = st.selectbox("Selecciona el curso:", cursos)
-
+    db_file="calendarios_optimizados.db"
+    conn = sqlite3.connect(db_file)
+    carreras = get_carreras(conn)
+    
+    
+    # Llenar los selectboxes con los valores únicos
+    carrera = st.selectbox("Selecciona la carrera:", carreras, key='carrera_seleccionada')
+    cursos = get_cursos(conn,carrera)
+   
+    curso = st.selectbox("Selecciona el curso:", cursos, key='curso')
+    años = get_años(conn,carrera,curso)
+    año = st.selectbox("Selecciona el año:", años, key='año_seleccionado')
+        
     if st.button("Mostrar Calendario"):
-        asignaturas = obtener_asignaturas(carrera_seleccionada, año_seleccionado, curso_seleccionado)
-       
-        if asignaturas:
-            st.markdown(f"## Calendario para {carrera_seleccionada} {año_seleccionado}")
-            # Crear una lista de listas para usar en st.table
-            data = [[asignatura, fecha_inicio, fecha_fin] for asignatura, fecha_inicio, fecha_fin in asignaturas]
-            # Mostrar la tabla sin el argumento 'headers'
-            st.table(data)
+        conn = sqlite3.connect('calendarios_optimizados.db')
+        c = conn.cursor()
+        
+        # Realizar la consulta a la base de datos
+        c.execute('''
+            SELECT asignatura, fecha_examen
+            FROM calendarios
+            WHERE carrera = ? AND año = ? AND curso = ?
+        ''', (carrera, año, curso))
+        resultados = c.fetchall()
+        
+        if resultados:
+            st.markdown(f"## Calendario para {carrera} {año}")
+            # Convertir los resultados a un DataFrame de pandas
+            df = pd.DataFrame(resultados, columns=['Asignatura', 'Fecha de Examen'])
+            # Mostrar la tabla con pandas
+            st.table(df)
         else:
             st.write("No se encontraron asignaturas para la selección.")
+        
+        conn.close()
 
 app()

@@ -1,21 +1,19 @@
 import sqlite3
 import os
 import numpy as np
+import streamlit as st
 from datetime import datetime, timedelta
-from problem import Problem
+from pages.problem import Problem
 def create_new_database(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
+    c.execute('DROP TABLE IF EXISTS calendarios')
     c.execute('''CREATE TABLE IF NOT EXISTS calendarios
                  (carrera TEXT, año INTEGER, curso TEXT, asignatura TEXT, fecha_examen TEXT)''')
     conn.commit()
     return conn
 
-def read_current_database(db_name):
-    conn = sqlite3.connect(db_name)
-    c = conn.cursor()
-    c.execute('SELECT carrera, año, curso, asignatura, fecha_examen FROM evaluaciones')
-    return c.fetchall()
+
 def read_distinct_data(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
@@ -82,11 +80,14 @@ def preprocesar_datos(detalles,calificaciones):
     calificaciones_por_asignatura=[]
     duracion_cursos=[]
     inicio_cursos=[]
+    asignaturas=[]
     for clave, evaluaciones in detalles.items():
         # Extraer y procesar las fechas
+        
         fechas_excluidas_locales = []
         
         for i in range(len(evaluaciones)): 
+            asignaturas.append(evaluaciones[i][0])
             fechas_excluidas_locales.append(evaluaciones[i][1].split('/'))
         
         for i in range(len(fechas_excluidas_locales)):
@@ -148,19 +149,30 @@ def preprocesar_datos(detalles,calificaciones):
     for i in range(len(plazos_examen_total)):
         cursos.append(Curso(len(plazos_examen_total[i]),F[i],V[i],K[i],Di[i]))
         
-        pre_calendario.append(cursos[i].fit_to_date(inicio_curso))
+        pre_calendario.append(cursos[i].fit_to_date(inicio_cursos[i]))
+        
     calendario ={}
     i=0
+    j=0
     for clave, evaluaciones in detalles.items():
-        clave_=(evaluacion[0],clave[0],clave[1],clave[2])
-        calendario[clave] = pre_calendario[i]
+        
+        clave_=(clave[0],clave[1],clave[2])
+        for element in pre_calendario[i]:
+                calendario[clave[0],clave[1],clave[2],j] = (element,asignaturas[j])
+                
+                
+                j+=1
+            
         i+=1
     
     return calendario
 def process_data_and_save(data, new_db_name):
     new_db_conn = create_new_database(new_db_name)
     c = new_db_conn.cursor()
-    for carrera, año, curso, asignatura, fecha_examen in data:
+    
+    for key, value in data.items():
+        carrera, año, curso, asignatura, _ = key
+        fecha_examen = value.strftime('%Y-%m-%d %H:%M:%S') # Convertir datetime a string
         c.execute('INSERT INTO calendarios VALUES (?, ?, ?, ?, ?)', (carrera, año, curso, asignatura, fecha_examen))
     new_db_conn.commit()
     new_db_conn.close()
@@ -174,17 +186,7 @@ class Curso (Problem):
         return x
     def __init__ (self, N, F, V, K, Di):
         super ().__init__ (1, N, [F], [V], [K], [Di])
-def main():
-    current_db_name = 'evaluaciones.db'
-    new_db_name = 'calendarios_optimizados.db'
-    create_new_database(new_db_name)
-    # Leer la base de datos actual
-    data = read_current_database(current_db_name)
-    
-    # Procesar los datos y guardar en la nueva base de datos
-    process_data_and_save(data, new_db_name)
-    
-    print(f"Calendarios optimizados guardados en {new_db_name}")
+
 def calculate_workload(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
@@ -209,8 +211,7 @@ def calculate_workload(db_name):
 # Uso de la función
 db_name = 'usuario_clasificaciones.db'
 K = calculate_workload(db_name)
-print("calificaciones")
-print(K)
+
 def main():
     db_name = 'evaluaciones.db'
     # Leer todos los valores únicos por carrera, año y curso
@@ -230,7 +231,20 @@ def main():
     for clave, detalles in detalles_indexados.items():
         detalles_procesados[clave] = procesar_evaluaciones(detalles)
     calificaciones=calculate_workload('usuario_clasificaciones.db')
-    preprocesar_datos(detalles_procesados,calificaciones)
+    calendario=preprocesar_datos(detalles_procesados,calificaciones)
     
+    calendario_procesado ={ }
+    llaves=calendario.keys()
+    valores=calendario.values()
+    for element in calendario.keys():
+        calendario_procesado[element[0],element[1],element[2],calendario[element][1],element[3]]=calendario[element][0]
+    print(calendario_procesado)
+    process_data_and_save(calendario_procesado,"calendarios_optimizados.db")
+def run_app():
+    st.title('Optimización de Calendario Académico')
+    if st.button('Optimizar Calendario'):
+        main()
+
 if __name__ == "__main__":
-    main()
+    
+    run_app()

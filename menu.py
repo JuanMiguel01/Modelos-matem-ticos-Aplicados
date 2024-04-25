@@ -6,6 +6,8 @@ def authenticated_menu():
     st.sidebar.page_link("pages/user.py", label="Your profile")
     st.sidebar.page_link("pages/calendario.py", label="Calendario")
     st.sidebar.page_link("pages/calificacion.py", label="Calificacion")
+    if st.session_state.role in [ "super-admin"]:
+        st.sidebar.page_link("pages/crear_calendario.py", label="Crear los calendarios")
     if st.session_state.role in ["admin", "super-admin"]:
         st.sidebar.page_link("pages/admin.py", label="Manage users")
         st.sidebar.page_link("pages/planificacion.py", label="Planificacion")

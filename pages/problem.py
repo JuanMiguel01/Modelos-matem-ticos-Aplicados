@@ -1,4 +1,4 @@
-from genetic import optimize
+from pages.genetic import optimize
 from typing import List, Tuple
 import math
 import numpy as np
