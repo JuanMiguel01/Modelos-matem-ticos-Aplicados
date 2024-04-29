@@ -46,12 +46,13 @@ def procesar_evaluaciones(detalles):
     for asignatura, duracion_curso, evaluacion, rangos_fechas, fechas_excluidas in detalles:
         # Dividir las fechas de excluídas y los rangos de fechas
         fechas_excluidas = fechas_excluidas.split('///')
+
         rangos_fechas = rangos_fechas.split('//')
         
         # Asegurarse de que haya la misma cantidad de fechas excluidas y rangos de fechas
-        if len(fechas_excluidas) != len(rangos_fechas):
-            print(f"Error en la asignatura {asignatura}: fechas excluidas y rangos de fechas no coinciden.")
-            continue
+        
+        if (fechas_excluidas== '//'):
+            fechas_excluidas=[]
         
         # Procesar cada evaluación individualmente
         for i in range(len(fechas_excluidas)):
@@ -70,10 +71,6 @@ def procesar_evaluaciones(detalles):
 
 
 
-
-#
-#ver lo de las fechas excluidas que no se estan poniendo como una lista delisat s
-
 def preprocesar_datos(detalles,calificaciones):
     fechas_excluidas=[]
     plazos_examen_total=[]
@@ -88,7 +85,9 @@ def preprocesar_datos(detalles,calificaciones):
         
         for i in range(len(evaluaciones)): 
             asignaturas.append(evaluaciones[i][0])
-            fechas_excluidas_locales.append(evaluaciones[i][1].split('/'))
+            if(evaluaciones[i][1]=='//'):
+                fechas_excluidas_locales.append([])
+            else:fechas_excluidas_locales.append(evaluaciones[i][1].split('/'))
         
         for i in range (len (fechas_excluidas_locales)):
 
@@ -116,11 +115,9 @@ def preprocesar_datos(detalles,calificaciones):
 
             inicio_curso = datetime.strptime(evaluacion[3].split('/')[0], '%Y-%m-%d')
             fin_curso = datetime.strptime(evaluacion[3].split('/')[1], '%Y-%m-%d')
-
-
             duracion_curso = fin_curso - inicio_curso
         inicio_cursos.append(inicio_curso)
-
+        
         duracion_cursos.append(duracion_curso.days)
         for i in range(len(fechas_examen)):
 
@@ -132,8 +129,10 @@ def preprocesar_datos(detalles,calificaciones):
         for evaluacion in evaluaciones:
             asignatura = evaluacion[0]
             clave_=(asignatura,clave[0],clave[1],clave[2])
-            calificacion.append(calificaciones[clave_])
-        
+            try:
+                calificacion.append(calificaciones[clave_])
+            except:
+                calificacion.append(5)
         calificaciones_por_asignatura.append(calificacion)
     
     for i in range(len(fechas_excluidas)):
@@ -242,7 +241,7 @@ def main():
     valores=calendario.values()
     for element in calendario.keys():
         calendario_procesado[element[0],element[1],element[2],calendario[element][1],element[3]]=calendario[element][0]
-    print(calendario_procesado)
+    
     process_data_and_save(calendario_procesado,"calendarios_optimizados.db")
 def run_app():
     st.title('Optimización de Calendario Académico')

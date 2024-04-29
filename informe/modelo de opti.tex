@@ -1,0 +1,146 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\title {Propuesta de aplicación para la planificación de evaluaciones}
+\author{Juan Miguel Pérez Martínez, Amanda Noris Hernández , Marcos Antonio Pérez Lorenzo}
+\begin{document}
+\begin{titlepage}
+\centering
+{\bfseries\LARGE Universidad de La Habana \par}
+\vspace{1cm}
+{\scshape\Large Facultad de Ciencias de la Computación \par}
+\vspace{3cm}
+{\scshape\Huge Creaci\'on de propuesta de aplicaci\'on y modulo de optimizaci\'on para la realizaci\'on de calendarios de ex\'amenes  \par}
+\vspace{3cm}
+{\itshape\Large Proyecto de la asignatura Modelos Matem\'aticos Aplicados\par}
+\vfill
+{\Large  Juan Miguel P\'erez Martínez  \\
+Marcos Antonio Pérez Lorenzo  \\
+Amanda Noris Hernández\par}
+
+\vfill
+{\Large Abril 2024 \par}
+\end{titlepage}
+\section{Objetivo del Proyecto}
+
+El objetivo principal de este proyecto es diseñar e implementar una aplicación que permita determinar la mejor manera posible de planificar las evaluaciones de cada asignatura a lo largo del semestre. Para lograr este objetivo, se considerarán varios factores clave:
+
+\begin{enumerate}
+\item Requisitos de las Asignaturas: Se analizarán las necesidades específicas de cada asignatura en términos de la cantidad de evaluaciones y el período ideal para realizarlas.
+\item Conveniencia de las Evaluaciones: Se evaluará qué evaluaciones tiene sentido realizar en una misma semana, considerando la carga de trabajo para los estudiantes.
+\item Implicaciones para los Estudiantes: Se medirá el impacto que tiene para los estudiantes la planificación de cada evaluación en una semana específica.
+\end{enumerate}
+
+\section{Metas y Objetivos Específicos}
+
+Para alcanzar el objetivo principal del proyecto, se buscan los siguientes metas y objetivos específicos:
+
+\begin{enumerate}
+\item Análisis de Requisitos: Se buscará la manera de obtener los requisitos de cada asignatura, incluyendo la cantidad de evaluaciones y el período ideal para su realización.
+\item Evaluación de Conveniencia: Identificar qué evaluaciones son convenientes realizar en una misma semana, teniendo en cuenta la carga de trabajo para los estudiantes.
+\item Diseño de la Aplicación: Diseñar una aplicación que permita a los usuarios (profesores y estudiantes) planificar las evaluaciones de manera eficiente, considerando los requisitos de las asignaturas y el impacto para los estudiantes.
+\item Feedback y Mejora Continua: Recopilar feedback de los usuarios y realizar mejoras continuas en la aplicación para optimizar la planificación de las evaluaciones.
+\end{enumerate}
+\section{Resultados Claves del Proyecto}
+\begin{enumerate}
+\item{Desarrollo de una Aplicación Web para la Gestión de Calendarios de Exámenes: }
+La aplicación web desarrollada facilita la recopilación de datos necesarios para la planificación de calendarios de exámenes, permitiendo a los usuarios ingresar información relevante como fechas de exámenes, cursos, y asignaturas, así como la carga de trabajo que representa cada asignatura para cada uno.
+
+\item{Implementación de un Algoritmo Genético para la Optimización de Calendarios :}
+Se ha implementado un algoritmo genético que utiliza técnicas de cruce, mutación, y selección para optimizar la planificación de calendarios de exámenes. Este algoritmo busca minimizar conflictos de horarios y la carga de trabajo de los estudiantes, asegurando que todos los estudiantes puedan cumplir con sus obligaciones académicas.
+
+\item{Mejora en la Eficiencia y Coherencia de los Calendarios de Exámenes :}
+Gracias a la aplicación web y al algoritmo genético, se ha logrado una mejora significativa en la eficiencia y coherencia de los calendarios de exámenes.
+
+\item{Contribución al Aprendizaje y Desarrollo de Competencias :}
+El proyecto ha servido como una plataforma para el aprendizaje y desarrollo de competencias en programación, optimización, y gestión de proyectos. Los participantes han adquirido habilidades valiosas en el desarrollo de aplicaciones web, modelado de problemas, y la implementación de algoritmos genéticos.
+\end{enumerate}
+\section{Introducción}
+
+\subsection{Contexto del Proyecto}
+
+El proyecto se inició en respuesta a un problema recurrente en la facultad: la planificación de las evaluaciones de cada asignatura a lo largo del semestre. Este desafío se presenta cada semestre, poniendo en riesgo la eficiencia y la satisfacción de los estudiantes y profesores. La necesidad de encontrar una solución eficiente y efectiva para este problema es imperativa, ya que afecta directamente la calidad de la educación y la experiencia de aprendizaje de los estudiantes.
+\subsection{Sobre el problema :}
+
+En el ámbito académico, la planificación de evaluaciones es una tarea crítica que afecta directamente la eficiencia del proceso educativo y la satisfacción de los estudiantes y profesores. Este problema se presenta anualmente en muchas instituciones educativas, donde se requiere una solución que permita optimizar la distribución de las evaluaciones a lo largo del semestre, considerando los requisitos específicos de cada asignatura, las implicaciones para los estudiantes y la medición del impacto de estas decisiones en la experiencia de aprendizaje.
+
+La necesidad de una solución eficiente y efectiva para este problema es imperativa, dado que una planificación adecuada de las evaluaciones puede mejorar significativamente la calidad de la educación, facilitar la gestión del tiempo de los estudiantes y profesores, y reducir los conflictos de horarios. Este informe presenta un enfoque innovador para abordar este problema, utilizando técnicas avanzadas de optimización y modelado matemático para diseñar una aplicación que permita determinar la mejor manera posible de planificar las evaluaciones, teniendo en cuenta todos los factores relevantes.
+\section{Intentos de Optimización que no funcionaron}
+
+\subsection{Optimización con pulp}
+El primer intento se realizó utilizando la biblioteca pulp, que permite modelar problemas de optimización como problemas de programación lineal. Este enfoque tampoco funcionó por la linealidad. El código correspondiente se puede encontrar en el Anexo B.
+
+\subsection{Optimización con scipy.optimize}
+El segundo intento de optimización se realizó utilizando la función minimize de scipy.optimize, junto con NonlinearConstraint para definir restricciones específicas. Este enfoque no funcionó debido a la linealidad. El código correspondiente se puede encontrar en el Anexo A.
+
+\subsection{Optimización con gurobipy}
+El tercer intento se realizó utilizando gurobipy, una interfaz de Python para el solver Gurobi. Tampoco funcionó (no se implement\'o en su totalidad). El código correspondiente se puede encontrar en el Anexo C.
+
+\subsection{Optimización con scipy.optimize y Clases Personalizadas}
+El último intento se realizó utilizando scipy.optimize junto con clases personalizadas para definir el problema de optimización y el proceso de optimización. Este enfoque permitió una mayor flexibilidad y control sobre el proceso de optimización, incluyendo la capacidad de dividir el problema en subproblemas más pequeños y manejar de manera más eficiente las restricciones y la función objetivo. Aunque tampoco con esto pudimos lograr el objetivo. El código correspondiente se puede encontrar en el Anexo D.
+\section{Definición del Modelo de Optimización}
+
+Minimizar $f(x)$ donde $f: \mathbb{M}^{n \times m}(\mathbb{N}) \rightarrow \mathbb{R}$.
+
+\begin{itemize}
+\item $F$ es el conjunto de días no elegibles (días festivos, fines de semana, días no disponibles para el profesor o alumnos, etc.).
+\item $V_{ij}$ es el conjunto de conjuntos de días elegibles para la j-ésima asignatura en el i-ésimo curso.
+\item $k_{ij}$ es la carga de trabajo específica para la asignatura j-ésima del i-ésimo curso.
+\item $D_i$ son los días totales correspondientes al curso i-ésimo.
+\end{itemize}
+
+La función objetivo $f(x)$ se define como:
+
+\[
+f(x) = \sum_{i=1}^{n} (ke_i + kp_i + kc_i)
+\]
+
+$$\text{s.a.}$$:
+$$x_{ij}\notin F$$
+$$x_{ij} \geq V_{ij0}$$
+$$x_{ij} \leq V_{ij1}$$
+
+donde:
+
+\begin{itemize}
+\item $E_{ijk}$ es un conjunto auxiliar para $ke_i$, definido como:
+
+\[
+E_{ijk} = 
+\begin{cases} 
+1 & \text{si } x_{ij} > k \\
+0 & \text{en otro caso}
+\end{cases}
+\]
+
+\item $C_{ik}$ es un conjunto auxiliar para $kc_i$, definido como:
+
+\[
+C_{ik} = 
+\begin{cases} 
+k_{ia} + k_{ib} & \text{si existe } a, b : X_{ia} = X_{ib} = k \\
+0 & \text{en otro caso}
+\end{cases}
+\]
+
+\item $ke_i$ es la carga del estudiante, calculada como:
+
+\[
+ke_i = \sum_{j=1}^{m} \sum_{k=1}^{D_i} E_{ijk} \cdot \frac{k_{ij}}{1 + |X_{ij} - V_{ij0}|}
+\]
+
+\item $kp_i$ es la carga de proximidad, calculada como:
+
+\[
+kp_i = \sum_{a=1}^{m} \sum_{b=1}^{m} \frac{k_{ia} + k_{ib}}{1 + |X_{ia} - X_{ib}|}
+\]
+
+\item $kc_i$ es la carga de trabajo específica, calculada como:
+
+\[
+kc_i = \sum_{k=1}^{D_i} C_{ik}
+\]
+
+\end{itemize}
+
+
+\end{document}

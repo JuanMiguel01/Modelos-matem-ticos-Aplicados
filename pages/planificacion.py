@@ -33,10 +33,8 @@ def fecha_excluida_component(key,fecha_inicio,fecha_fin):
 
                 # Actualizar la fecha excluida en el estado de la sesión
                 item["fecha"] = fecha_excluida
-                st.write(f"Fecha excluida {item['id']}: {fecha_excluida}")
+                
 
-        # Mostrar las fechas excluidas actuales
-        st.write(f"Fechas excluidas actuales: {st.session_state[key]}")
         return st.session_state[key]
 
 def create_connection(db_file):
@@ -154,8 +152,7 @@ def app():
                     st.warning("El valor ingresado debe ser un número entero")
                     evaluacion = None
         
-        st.write(fechas_excluidas,"fechas excluidas")
-    
+        
     
     if st.button("Guardar"):
         if not asignatura or not evaluacion:
@@ -183,13 +180,12 @@ def app():
                 db_file = "evaluaciones.db" 
                 conn = create_connection(db_file) 
                 
-                st.write(fechas_excluidas)
-                st.write(rangos_fechas)
+                
                 duracion_curso=(f"{fecha_inicio_curso}/{fecha_fin_curso}")
-                st.write(duracion_curso)
+                
                 if conn is not None:
                     create_table(conn)
-                    st.write()
+                    
                     data = (curso,duracion_curso, carrera_seleccionada, año_seleccionado, asignatura, evaluacion, '//'.join(rangos_fechas), '//'.join(fechas_excluidas))
                     insert_or_update_data(conn, data)
                     conn.commit()
