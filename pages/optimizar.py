@@ -90,13 +90,17 @@ def preprocesar_datos(detalles,calificaciones):
             asignaturas.append(evaluaciones[i][0])
             fechas_excluidas_locales.append(evaluaciones[i][1].split('/'))
         
-        for i in range(len(fechas_excluidas_locales)):
-            for j in range(len(fechas_excluidas_locales[i])):
-                if fechas_excluidas_locales[i][j]=='':
-                    fechas_excluidas_locales[i].remove(fechas_excluidas_locales[i][j])
-                else:
-                    
-                    fechas_excluidas_locales[i][j]=datetime.strptime(fechas_excluidas_locales[i][j], '%d-%m-%Y')
+        for i in range (len (fechas_excluidas_locales)):
+
+            while True:
+
+                try:
+                    fechas_excluidas_locales[i].remove ('')
+                except ValueError:
+                    break
+
+            fechas_excluidas_locales[i] = [ datetime.strptime (d, '%d-%m-%Y') for d in fechas_excluidas_locales[i] ]
+
         fechas_excluidas.append(fechas_excluidas_locales) 
             
         fechas_examen = []
