@@ -1,9 +1,9 @@
-import sqlite3
-import os
-import numpy as np
-import streamlit as st
 from datetime import datetime, timedelta
 from pages.problem import Problem
+from typing import List, Tuple
+import sqlite3
+import streamlit as st
+
 def create_new_database(db_name):
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
@@ -60,115 +60,58 @@ def procesar_evaluaciones(detalles):
             evaluaciones_procesadas.append(evaluacion_individual)
     
     return evaluaciones_procesadas
-#
-#
-
-
-
-
-
-
-
-
 
 def preprocesar_datos(detalles,calificaciones):
-    fechas_excluidas=[]
-    plazos_examen_total=[]
-    calificaciones_por_asignatura=[]
-    duracion_cursos=[]
-    inicio_cursos=[]
-    asignaturas=[]
-    for clave, evaluaciones in detalles.items():
-        # Extraer y procesar las fechas
-        
-        fechas_excluidas_locales = []
-        
-        for i in range(len(evaluaciones)): 
-            asignaturas.append(evaluaciones[i][0])
-            if(evaluaciones[i][1]=='//'):
-                fechas_excluidas_locales.append([])
-            else:fechas_excluidas_locales.append(evaluaciones[i][1].split('/'))
-        
-        for i in range (len (fechas_excluidas_locales)):
 
-            while True:
+    j = 0
 
-                try:
-                    fechas_excluidas_locales[i].remove ('')
-                except ValueError:
-                    break
+    calendar = { }
 
-            fechas_excluidas_locales[i] = [ datetime.strptime (d, '%d-%m-%Y') for d in fechas_excluidas_locales[i] ]
+    for (course_name, grade, year), subjects in detalles.items ():
 
-        fechas_excluidas.append(fechas_excluidas_locales) 
-            
-        fechas_examen = []
-        for evaluacion in evaluaciones:
-            # Separar las fechas de inicio y fin del examen
-            inicio_fin_examen = evaluacion[2].split('/')
-            inicio_examen = datetime.strptime(inicio_fin_examen[0], '%Y-%m-%d')
-            fin_examen = datetime.strptime(inicio_fin_examen[1], '%Y-%m-%d')
-            fechas_examen.append((inicio_examen, fin_examen))
-        plazos_examen =[]
-        duracion_curso=0
-        for evaluacion in evaluaciones:
+        F: List[List[int]] = []
+        V: List[Tuple[int, int]] = []
+        K: List[int] = []
+        Di: int = 0
 
-            inicio_curso = datetime.strptime(evaluacion[3].split('/')[0], '%Y-%m-%d')
-            fin_curso = datetime.strptime(evaluacion[3].split('/')[1], '%Y-%m-%d')
-            duracion_curso = fin_curso - inicio_curso
-        inicio_cursos.append(inicio_curso)
-        
-        duracion_cursos.append(duracion_curso.days)
-        for i in range(len(fechas_examen)):
+        for i, (subject_name, excluded, range_, length) in enumerate (subjects):
 
-                plazos_examen.append((fechas_examen[i][0]-inicio_curso, fechas_examen[i][1]-inicio_curso))
-        for i in range (len(plazos_examen)):
-            plazos_examen[i] = (plazos_examen[i][0].days, plazos_examen[i][1].days)
-        plazos_examen_total.append(plazos_examen)
-        calificacion=[]
-        for evaluacion in evaluaciones:
-            asignatura = evaluacion[0]
-            clave_=(asignatura,clave[0],clave[1],clave[2])
-            try:
-                calificacion.append(calificaciones[clave_])
-            except:
-                calificacion.append(5)
-        calificaciones_por_asignatura.append(calificacion)
-    
-    for i in range(len(fechas_excluidas)):
-        for j in range(len(fechas_excluidas[i])):
-            for k in range(len(fechas_excluidas[i][j])):
-                fechas_excluidas[i][j][k] = fechas_excluidas[i][j][k]-inicio_curso
-                fechas_excluidas[i][j][k] = fechas_excluidas[i][j][k].days
-    
-    # Calcular F, V, K, Di
-    F = fechas_excluidas
-    V = plazos_examen_total
-    
-    K = calificaciones_por_asignatura
-    Di = duracion_cursos
-    cursos=[]
-    pre_calendario=[]
-    for i in range(len(plazos_examen_total)):
-        cursos.append(Curso(len(plazos_examen_total[i]),F[i],V[i],K[i],Di[i]))
-        
-        pre_calendario.append(cursos[i].fit_to_date(inicio_cursos[i]))
-        
-    calendario ={}
-    i=0
-    j=0
-    for clave, evaluaciones in detalles.items():
-        
-        clave_=(clave[0],clave[1],clave[2])
-        for element in pre_calendario[i]:
-                calendario[clave[0],clave[1],clave[2],j] = (element,asignaturas[j])
-                
-                
-                j+=1
-            
-        i+=1
-    
-    return calendario
+            excluded_dates: List[datetime]
+
+            if excluded == '//':
+
+                excluded_dates = []
+
+            else:
+
+                excluded_dates = excluded.split ('/')
+
+                while True:
+
+                    try:
+                        excluded_dates.remove ('')
+                    except ValueError:
+                        break
+
+                excluded_dates = [ datetime.strptime (d, '%d-%m-%Y') for d in excluded_dates ]
+
+            begin_date, end_date = (datetime.strptime (d, '%Y-%m-%d') for d in range_.split ('/'))
+            begin_course, end_course = (datetime.strptime (d, '%Y-%m-%d') for d in length.split ('/'))
+
+            F.append ([ (d - begin_course).days for d in excluded_dates ])
+            V.append (((begin_date - begin_course).days, (end_date - begin_course).days))
+            K.append (calificaciones.get ((subject_name, course_name, grade, year), 5))
+            Di = max (Di, (end_course - begin_course).days)
+
+        course = Curso (len (F), F, V, K, Di).fit_to_date (begin_course)
+
+        for d, (subject_name, excluded, range_, length) in zip (course, subjects):
+
+            calendar[course_name, grade, year, j] = (d, subject_name)
+            j += 1
+
+    return calendar
+
 def process_data_and_save(data, new_db_name):
     new_db_conn = create_new_database(new_db_name)
     c = new_db_conn.cursor()
@@ -243,6 +186,7 @@ def main():
         calendario_procesado[element[0],element[1],element[2],calendario[element][1],element[3]]=calendario[element][0]
     
     process_data_and_save(calendario_procesado,"calendarios_optimizados.db")
+
 def run_app():
     st.title('Optimización de Calendario Académico')
     if st.button('Optimizar Calendario'):

@@ -17,7 +17,9 @@ def main():
     run_button = st.button('Ejecutar Optimización')
     
     if run_button:
+
         run_optimization()
+        st.write ("Optimización completada")
 
 if __name__ == "__main__":
     main()
