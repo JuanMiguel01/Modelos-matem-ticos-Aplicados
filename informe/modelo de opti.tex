@@ -161,14 +161,39 @@ Cada solución en el algoritmo genético se representa como una cadena de bits, 
 \subsubsection{Cruce (cross)}
 
 Se realiza un cruce entre dos soluciones seleccionadas, combinando partes de ambas soluciones para generar nuevas soluciones. Este proceso introduce diversidad en la población y ayuda a explorar diferentes combinaciones de horarios.
+Para combinar dos cromosomas, primero se obtiene un valor aleatorio normal; si dicho valor sobrepasa un umbral preestablecido (factor de cruzamiento, \(pc\) en la literatura) se selecciona una posici\'on aleatoria y se mezclan los cromosomas, seccionando en dicha posici\'on y uniendo la parte correspondiente del segundo cromosoma, luego las partes restantes se unen para formar un segundo cromosoma.
+
+Ejemplo:
+
+\[a = 010001110100011001000011111110001011110001001111\]
+\[b = 010010000111100111101110000111011011110111100011\]
+\[p = 27\]
+\[a_{1} = 010001110100011001000011111\]
+\[a_{2} = 110001011110001001111\]
+\[b_{1} = 010010000111100111101110000\]
+\[b_{2} = 111011011110111100011\]
+\[a_{1}b_{2} = 010001110100011001000011111111011011110111100011\]
+\[a_{2}b_{1} = 110001011110001001111010010000111100111101110000\]
 
 \subsubsection{Mutación (mutate)}
 
 Se realiza una mutación en una solución, cambiando aleatoriamente algunos de los bits. Esto introduce variación en la población y ayuda a evitar quedar atrapado en óptimos locales.
+Para mutar un cromosoma, se itera sobre cada posici\'on en el cromosoma, para cada una se obtiene un valor aleatorio normal; si dicho valor sobrepasa un umbral preestablecido (factor de mutaci\'on, \(pm\) en la literatura), se invierte el valor del bit en dicha posi\'ion.
+
+Ejemplo
+
+\[a = 0110 ...\]
+\[pm = 0.8\]
+\[\text{Paso 1: } p = 0.43, a_{1} = 0110 ...\]
+\[\text{Paso 2: } p = 0.89, a_{2} = 0010 ...\]
+\[\text{Paso 3: } p = 0.21, a_{3} = 0010 ...\]
+\[\text{Paso 4: } p = 0.75, a_{4} = 0010 ...\]
+\[\text{Paso }\imath\text{-\'esimo: } a_{\imath} = 0010 ...\]
 
 \subsubsection{Selección (selection)}
 
 Se seleccionan soluciones para el próximo ciclo de cruce y mutación basándose en sus puntuaciones. Las soluciones con mejores puntuaciones tienen más probabilidades de ser seleccionadas, lo que favorece la evolución hacia soluciones de mayor calidad.
+Para la selecci\'on se toman \(k\) cromosomas aleatorios (en nuestro caso \(k = 3\)) de la poblaci\'on, luego de ellos se toma en cromosoma de major aptitud. 
 
 \subsection{Optimización}
 
