@@ -1,5 +1,17 @@
 
-# Propuesta de aplicación para la planificación de evaluaciones 
+# Propuesta de aplicación para la planificación de evaluaciones
+
+## Intrucciones
+
+#### Dependencias
+```cmd
+pip install
+```
+
+#### Aplicación web
+```cmd
+streamlit run main.py
+```
 
 ## Objetivo del Proyecto
 
